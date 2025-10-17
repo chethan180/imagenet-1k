@@ -1,0 +1,44 @@
+model:
+  name: "resnet50"
+  num_classes: 1000
+  pretrained: false
+  
+data:
+  dataset: "imagenet1k"  # or "imagenet100k"
+  data_path: "/path/to/imagenet"
+  batch_size: 256
+  num_workers: 8
+  pin_memory: true
+  
+training:
+  epochs: 90
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 1e-4
+  label_smoothing: 0.1
+  mixup_alpha: 0.2
+  cutmix_alpha: 1.0
+  
+optimizer:
+  name: "sgd"
+  momentum: 0.9
+  weight_decay: 1e-4
+  nesterov: true
+  
+scheduler:
+  name: "cosine"
+  warmup_epochs: 5
+  warmup_lr: 1e-6
+  min_lr: 1e-5
+  
+logging:
+  project_name: "imagenet-training"
+  log_interval: 100
+  save_interval: 10
+  use_wandb: true
+  
+misc:
+  seed: 42
+  device: "cuda"
+  amp: true  # Automatic Mixed Precision
+  compile: true  # torch.compile for speed
