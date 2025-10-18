@@ -1,0 +1,49 @@
+model:
+  name: "resnet50"
+  num_classes: 200
+  pretrained: false
+  
+data:
+  # dataset: "imagenet1k"  # or "imagenet100k"
+  dataset: "tinyimagenet"
+  data_path: "/content/drive/MyDrive/tiny-imagenet" # Update this path after downloading ImageNet-1K
+  batch_size: 256
+  num_workers: 8
+  pin_memory: true
+  # Note: Run 'python setup_imagenet.py --instructions' for download help
+  
+training:
+  epochs: 90
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 1e-4
+  label_smoothing: 0.1
+  mixup_alpha: 0.2
+  cutmix_alpha: 1.0
+  
+optimizer:
+  name: "sgd"
+  momentum: 0.9
+  weight_decay: 1e-4
+  nesterov: true
+  
+scheduler:
+  name: "cosine"
+  warmup_epochs: 5
+  warmup_lr: 1e-6
+  min_lr: 1e-5
+  
+logging:
+  project_name: "imagenet-training"
+  log_interval: 100
+  save_interval: 10
+  # use_wandb: true
+  use_wandb: false
+  log_dir: "/content/drive/MyDrive/imagenet/logs"
+  checkpoint_dir: "content/drive/MyDrive/imagenet/checkpoints"
+  
+misc:
+  seed: 42
+  device: "cuda"
+  amp: true  # Automatic Mixed Precision
+  compile: true  # torch.compile for speed
