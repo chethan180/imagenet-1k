@@ -1,14 +1,16 @@
 model:
   name: "resnet50"
-  num_classes: 1000
+  num_classes: 200
   pretrained: false
   
 data:
-  dataset: "imagenet1k"  # or "imagenet100k"
-  data_path: "/path/to/imagenet"
+  # dataset: "imagenet1k"  # or "imagenet100k"
+  dataset: "tinyimagenet"
+  data_path: "/Users/chethan/Documents/era/imagenet/tiny-imagenet-200"  # Update this path after downloading ImageNet-1K
   batch_size: 256
   num_workers: 8
   pin_memory: true
+  # Note: Run 'python setup_imagenet.py --instructions' for download help
   
 training:
   epochs: 90
@@ -35,10 +37,14 @@ logging:
   project_name: "imagenet-training"
   log_interval: 100
   save_interval: 10
-  use_wandb: true
+  # use_wandb: true
+  use_wandb: false
+  log_dir: "/Users/chethan/Documents/era/imagenet/logs"
+  checkpoint_dir: "/Users/chethan/Documents/era/imagenet/checkpoints"
   
 misc:
   seed: 42
-  device: "cuda"
-  amp: true  # Automatic Mixed Precision
+  # device: "cuda"
+  device: "mps"
+  amp: false  # Automatic Mixed Precision
   compile: true  # torch.compile for speed

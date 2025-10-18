@@ -174,10 +174,17 @@ class ResNet(nn.Module):
         self.groups = groups
         self.base_width = width_per_group
 
-        self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False)
-        self.bn1 = norm_layer(self.inplanes)
-        self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        # For Tiny ImageNet (64x64), use smaller first conv and no maxpool
+        if num_classes == 200:  # Tiny ImageNet
+            self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False)
+            self.bn1 = norm_layer(self.inplanes)
+            self.relu = nn.ReLU(inplace=True)
+            self.maxpool = nn.Identity()  # No maxpooling for 64x64 images
+        else:  # Standard ImageNet
+            self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False)
+            self.bn1 = norm_layer(self.inplanes)
+            self.relu = nn.ReLU(inplace=True)
+            self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         dp_rates = [x.item() for x in torch.linspace(0, drop_path_rate, sum(layers))]
         

@@ -20,7 +20,8 @@ class Logger:
             self.setup_wandb()
     
     def setup_local_logging(self):
-        log_dir = os.path.join(os.getcwd(), 'logs', self.run_name)
+        base_log_dir = self.config['logging'].get('log_dir', os.path.join(os.getcwd(), 'logs'))
+        log_dir = os.path.join(base_log_dir, self.run_name)
         os.makedirs(log_dir, exist_ok=True)
         
         log_file = os.path.join(log_dir, 'training.log')
@@ -75,7 +76,8 @@ class Logger:
             wandb.log(info)
     
     def save_checkpoint(self, state, epoch, is_best=False):
-        checkpoint_dir = os.path.join(self.log_dir, 'checkpoints')
+        base_checkpoint_dir = self.config['logging'].get('checkpoint_dir', os.path.join(self.log_dir, 'checkpoints'))
+        checkpoint_dir = os.path.join(base_checkpoint_dir, self.run_name)
         os.makedirs(checkpoint_dir, exist_ok=True)
         
         filename = f'checkpoint_epoch_{epoch:03d}.pth'

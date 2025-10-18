@@ -1,9 +1,10 @@
 from .losses import LabelSmoothingCrossEntropy, MixupLoss, get_criterion
 from .optimizers import get_optimizer, get_scheduler_with_warmup
 from .metrics import AverageMeter, AccuracyMeter, accuracy
+from .logger import Logger
 
 __all__ = [
     'LabelSmoothingCrossEntropy', 'MixupLoss', 'get_criterion',
     'get_optimizer', 'get_scheduler_with_warmup',
-    'AverageMeter', 'AccuracyMeter', 'accuracy'
+    'AverageMeter', 'AccuracyMeter', 'accuracy', 'Logger'
 ]

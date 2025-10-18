@@ -88,6 +88,8 @@ pip install -r requirements.txt
 **Basic training**:
 ```bash
 python train.py --config configs/config.yaml --data-path /path/to/imagenet
+
+python train.py --config configs/config.yaml  
 ```
 
 **Training with custom parameters**:

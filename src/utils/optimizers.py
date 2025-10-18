@@ -11,23 +11,23 @@ def get_optimizer(model, config):
     if optimizer_config['name'].lower() == 'sgd':
         optimizer = optim.SGD(
             model.parameters(),
-            lr=training_config['lr'],
-            momentum=optimizer_config.get('momentum', 0.9),
-            weight_decay=optimizer_config.get('weight_decay', 1e-4),
+            lr=float(training_config['lr']),
+            momentum=float(optimizer_config.get('momentum', 0.9)),
+            weight_decay=float(optimizer_config.get('weight_decay', 1e-4)),
             nesterov=optimizer_config.get('nesterov', True)
         )
     elif optimizer_config['name'].lower() == 'adam':
         optimizer = optim.Adam(
             model.parameters(),
-            lr=training_config['lr'],
-            weight_decay=optimizer_config.get('weight_decay', 1e-4),
+            lr=float(training_config['lr']),
+            weight_decay=float(optimizer_config.get('weight_decay', 1e-4)),
             betas=optimizer_config.get('betas', (0.9, 0.999))
         )
     elif optimizer_config['name'].lower() == 'adamw':
         optimizer = optim.AdamW(
             model.parameters(),
-            lr=training_config['lr'],
-            weight_decay=optimizer_config.get('weight_decay', 1e-4),
+            lr=float(training_config['lr']),
+            weight_decay=float(optimizer_config.get('weight_decay', 1e-4)),
             betas=optimizer_config.get('betas', (0.9, 0.999))
         )
     else:

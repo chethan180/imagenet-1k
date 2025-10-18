@@ -14,23 +14,41 @@ class ImageNetDataset:
         self.dataset_type = config['data']['dataset']
         
     def get_transforms(self, is_training=True):
-        if is_training:
-            return transforms.Compose([
-                transforms.RandomResizedCrop(224),
-                transforms.RandomHorizontalFlip(),
-                autoaugment.AutoAugment(autoaugment.AutoAugmentPolicy.IMAGENET),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], 
-                                   std=[0.229, 0.224, 0.225]),
-            ])
+        if self.dataset_type == "tinyimagenet":
+            # Tiny ImageNet uses 64x64 images
+            if is_training:
+                return transforms.Compose([
+                    transforms.RandomCrop(64, padding=8),
+                    transforms.RandomHorizontalFlip(),
+                    transforms.ToTensor(),
+                    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+                                       std=[0.229, 0.224, 0.225]),
+                ])
+            else:
+                return transforms.Compose([
+                    transforms.ToTensor(),
+                    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+                                       std=[0.229, 0.224, 0.225]),
+                ])
         else:
-            return transforms.Compose([
-                transforms.Resize(256, interpolation=InterpolationMode.BILINEAR),
-                transforms.CenterCrop(224),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], 
-                                   std=[0.229, 0.224, 0.225]),
-            ])
+            # Standard ImageNet transforms
+            if is_training:
+                return transforms.Compose([
+                    transforms.RandomResizedCrop(224),
+                    transforms.RandomHorizontalFlip(),
+                    # autoaugment.AutoAugment(autoaugment.AutoAugmentPolicy.IMAGENET),  # Commented out for now
+                    transforms.ToTensor(),
+                    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+                                       std=[0.229, 0.224, 0.225]),
+                ])
+            else:
+                return transforms.Compose([
+                    transforms.Resize(256, interpolation=InterpolationMode.BILINEAR),
+                    transforms.CenterCrop(224),
+                    transforms.ToTensor(),
+                    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+                                       std=[0.229, 0.224, 0.225]),
+                ])
     
     def get_datasets(self):
         train_transform = self.get_transforms(is_training=True)
@@ -51,6 +69,15 @@ class ImageNetDataset:
                 transform=train_transform
             )
             val_dataset = ImageNet100K(
+                root=os.path.join(self.data_path, 'val'),
+                transform=val_transform
+            )
+        elif self.dataset_type == "tinyimagenet":
+            train_dataset = datasets.ImageFolder(
+                root=os.path.join(self.data_path, 'train'),
+                transform=train_transform
+            )
+            val_dataset = TinyImageNetVal(
                 root=os.path.join(self.data_path, 'val'),
                 transform=val_transform
             )
@@ -175,3 +202,47 @@ def rand_bbox(size, lam):
     bby2 = np.clip(cy + cut_h // 2, 0, H)
 
     return bbx1, bby1, bbx2, bby2
+
+
+class TinyImageNetVal(Dataset):
+    def __init__(self, root, transform=None):
+        self.root = root
+        self.transform = transform
+        self.samples = []
+        self.class_to_idx = {}
+        
+        self._load_annotations()
+        
+    def _load_annotations(self):
+        # Load validation annotations
+        annotations_file = os.path.join(self.root, 'val_annotations.txt')
+        
+        # First, create class mapping from training data
+        train_root = os.path.join(os.path.dirname(self.root), 'train')
+        classes = sorted([d for d in os.listdir(train_root) 
+                         if os.path.isdir(os.path.join(train_root, d))])
+        self.class_to_idx = {cls: idx for idx, cls in enumerate(classes)}
+        
+        # Load validation image mappings
+        with open(annotations_file, 'r') as f:
+            for line in f:
+                parts = line.strip().split('\t')
+                if len(parts) >= 2:
+                    img_name = parts[0]
+                    class_name = parts[1]
+                    img_path = os.path.join(self.root, 'images', img_name)
+                    if class_name in self.class_to_idx:
+                        self.samples.append((img_path, self.class_to_idx[class_name]))
+    
+    def __len__(self):
+        return len(self.samples)
+    
+    def __getitem__(self, idx):
+        path, target = self.samples[idx]
+        
+        with Image.open(path) as img:
+            img = img.convert('RGB')
+            if self.transform:
+                img = self.transform(img)
+        
+        return img, target
