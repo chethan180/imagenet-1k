@@ -84,6 +84,22 @@ class WarmupScheduler:
                 param_group['lr'] = lr
         else:
             self.scheduler.step(epoch - self.warmup_epochs)
+    
+    def state_dict(self):
+        return {
+            'current_epoch': self.current_epoch,
+            'warmup_epochs': self.warmup_epochs,
+            'warmup_lr': self.warmup_lr,
+            'base_lr': self.base_lr,
+            'scheduler_state_dict': self.scheduler.state_dict()
+        }
+    
+    def load_state_dict(self, state_dict):
+        self.current_epoch = state_dict['current_epoch']
+        self.warmup_epochs = state_dict['warmup_epochs']
+        self.warmup_lr = state_dict['warmup_lr']
+        self.base_lr = state_dict['base_lr']
+        self.scheduler.load_state_dict(state_dict['scheduler_state_dict'])
 
 
 def get_scheduler_with_warmup(optimizer, config):
@@ -97,8 +113,8 @@ def get_scheduler_with_warmup(optimizer, config):
             optimizer=optimizer,
             scheduler=scheduler,
             warmup_epochs=warmup_epochs,
-            warmup_lr=scheduler_config.get('warmup_lr', 1e-6),
-            base_lr=training_config['lr']
+            warmup_lr=float(scheduler_config.get('warmup_lr', 1e-6)),
+            base_lr=float(training_config['lr'])
         )
     else:
         return scheduler
