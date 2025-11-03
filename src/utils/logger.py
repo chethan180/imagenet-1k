@@ -4,6 +4,7 @@ import wandb
 from datetime import datetime
 import torch
 import json
+import matplotlib.pyplot as plt
 
 
 class Logger:
@@ -15,6 +16,10 @@ class Logger:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.run_name = run_name or f"{config['model']['name']}_{timestamp}"
         
+        self.train_history = {'loss': [], 'f1': [], 'precision': [], 'recall': []}
+        self.val_history = {'loss': [], 'f1': [], 'precision': [], 'recall': []}
+        self.epochs = []
+
         self.setup_local_logging()
         if self.use_wandb:
             self.setup_wandb()
@@ -100,29 +105,58 @@ class Logger:
             **{f'val_{k}': v for k, v in val_metrics.items()}
         }
         
+        # --- Save metrics history for plotting ---
+        self.epochs.append(epoch)
+        for key in ['loss', 'f1', 'precision', 'recall']:
+            self.train_history[key].append(train_metrics.get(key, float('nan')))
+            self.val_history[key].append(val_metrics.get(key, float('nan')))
+        
         self.log_metrics(summary, step=epoch)
         
         # Create comprehensive log message
         log_msg = (
             f"Epoch {epoch:03d} Summary - "
             f"LR: {lr:.6f}, "
-            f"Train Loss: {train_metrics['loss']:.4f}, "
-            f"Train Top1: {train_metrics['top1']:.2f}%, "
-            f"Val Loss: {val_metrics['loss']:.4f}, "
-            f"Val Top1: {val_metrics['top1']:.2f}%, "
-            f"Val Top5: {val_metrics['top5']:.2f}%"
+            f"Train Loss: {train_metrics.get('loss', 0):.4f}, "
+            f"Val Loss: {val_metrics.get('loss', 0):.4f}"
         )
         
-        # Add F1, Precision, Recall if available
-        if 'f1' in val_metrics:
-            log_msg += (
-                f", Val F1: {val_metrics['f1']:.2f}%, "
-                f"Val Precision: {val_metrics['precision']:.2f}%, "
-                f"Val Recall: {val_metrics['recall']:.2f}%"
-            )
+        # Add additional metrics
+        for m in ['f1', 'precision', 'recall']:
+            if m in val_metrics:
+                log_msg += f", Val {m.capitalize()}: {val_metrics[m]:.2f}%"
         
         self.logger.info(log_msg)
-    
+        
+        # --- Generate charts ---
+        self._plot_metrics()
+
+    def _plot_metrics(self):
+        """Generate and save charts for train/val metrics."""
+        plot_dir = os.path.join(self.log_dir, "plots")
+        os.makedirs(plot_dir, exist_ok=True)
+
+        metrics_to_plot = ['loss', 'f1', 'precision', 'recall']
+        plt.figure(figsize=(12, 8))
+
+        for i, m in enumerate(metrics_to_plot, 1):
+            plt.subplot(2, 2, i)
+            plt.plot(self.epochs, self.train_history[m], label=f"Train {m}")
+            plt.plot(self.epochs, self.val_history[m], label=f"Val {m}")
+            plt.title(m.upper())
+            plt.xlabel("Epoch")
+            plt.ylabel(m)
+            plt.legend()
+            plt.grid(True)
+
+        plt.tight_layout()
+        save_path = os.path.join(plot_dir, "metrics_epochwise.png")
+        plt.savefig(save_path)
+        plt.close()
+
+        if self.use_wandb:
+            wandb.log({"metrics_chart": wandb.Image(save_path)})
+
     def close(self):
         if self.use_wandb:
             wandb.finish()

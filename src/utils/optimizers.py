@@ -44,19 +44,19 @@ def get_scheduler(optimizer, config):
         scheduler = CosineAnnealingLR(
             optimizer,
             T_max=training_config['epochs'] - scheduler_config.get('warmup_epochs', 0),
-            eta_min=scheduler_config.get('min_lr', 1e-5)
+            eta_min=float(scheduler_config.get('min_lr', 1e-5))  # ✅ ensure float
         )
     elif scheduler_config['name'].lower() == 'step':
         scheduler = StepLR(
             optimizer,
-            step_size=scheduler_config.get('step_size', 30),
-            gamma=scheduler_config.get('gamma', 0.1)
+            step_size=int(scheduler_config.get('step_size', 30)),
+            gamma=float(scheduler_config.get('gamma', 0.1))
         )
     elif scheduler_config['name'].lower() == 'multistep':
         scheduler = MultiStepLR(
             optimizer,
-            milestones=scheduler_config.get('milestones', [30, 60, 80]),
-            gamma=scheduler_config.get('gamma', 0.1)
+            milestones=list(map(int, scheduler_config.get('milestones', [30, 60, 80]))),
+            gamma=float(scheduler_config.get('gamma', 0.1))
         )
     else:
         raise ValueError(f"Unsupported scheduler: {scheduler_config['name']}")
@@ -64,13 +64,14 @@ def get_scheduler(optimizer, config):
     return scheduler
 
 
+
 class WarmupScheduler:
     def __init__(self, optimizer, scheduler, warmup_epochs, warmup_lr, base_lr):
         self.optimizer = optimizer
         self.scheduler = scheduler
-        self.warmup_epochs = warmup_epochs
-        self.warmup_lr = warmup_lr
-        self.base_lr = base_lr
+        self.warmup_epochs = int(warmup_epochs)
+        self.warmup_lr = float(warmup_lr)
+        self.base_lr = float(base_lr)
         self.current_epoch = 0
         
     def step(self, epoch=None):
