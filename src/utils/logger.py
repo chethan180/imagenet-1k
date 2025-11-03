@@ -102,7 +102,8 @@ class Logger:
         
         self.log_metrics(summary, step=epoch)
         
-        self.logger.info(
+        # Create comprehensive log message
+        log_msg = (
             f"Epoch {epoch:03d} Summary - "
             f"LR: {lr:.6f}, "
             f"Train Loss: {train_metrics['loss']:.4f}, "
@@ -111,6 +112,16 @@ class Logger:
             f"Val Top1: {val_metrics['top1']:.2f}%, "
             f"Val Top5: {val_metrics['top5']:.2f}%"
         )
+        
+        # Add F1, Precision, Recall if available
+        if 'f1' in val_metrics:
+            log_msg += (
+                f", Val F1: {val_metrics['f1']:.2f}%, "
+                f"Val Precision: {val_metrics['precision']:.2f}%, "
+                f"Val Recall: {val_metrics['recall']:.2f}%"
+            )
+        
+        self.logger.info(log_msg)
     
     def close(self):
         if self.use_wandb:

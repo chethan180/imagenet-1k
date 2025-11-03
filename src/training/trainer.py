@@ -6,7 +6,7 @@ import numpy as np
 import random
 
 from ..data import mixup_data, cutmix_data
-from ..utils import AverageMeter, AccuracyMeter, MixupLoss
+from ..utils import AverageMeter, AccuracyMeter, ComprehensiveMetrics, MixupLoss
 
 
 class Trainer:
@@ -38,7 +38,7 @@ class Trainer:
         batch_time = AverageMeter()
         data_time = AverageMeter()
         losses = AverageMeter()
-        acc_meter = AccuracyMeter()
+        metrics_meter = ComprehensiveMetrics(num_classes=1000)
         
         end = time.time()
         
@@ -90,7 +90,7 @@ class Trainer:
             
             losses.update(loss.item(), images.size(0))
             if not use_mixup:
-                acc_meter.update(outputs, targets, images.size(0))
+                metrics_meter.update(outputs, targets, images.size(0))
             
             batch_time.update(time.time() - end)
             end = time.time()
@@ -99,7 +99,7 @@ class Trainer:
                 lr = self.optimizer.param_groups[0]['lr']
                 pbar.set_postfix({
                     'Loss': f'{losses.avg:.4f}',
-                    'Top1': f'{acc_meter.get_avg()["top1"]:.2f}%' if not use_mixup else 'N/A',
+                    'Top1': f'{metrics_meter.accuracy_meter.get_avg()["top1"]:.2f}%' if not use_mixup else 'N/A',
                     'LR': f'{lr:.6f}'
                 })
                 
@@ -112,7 +112,7 @@ class Trainer:
         
         metrics = {
             'loss': losses.avg,
-            **acc_meter.get_avg()
+            **metrics_meter.get_metrics()
         }
         
         return metrics
@@ -122,7 +122,7 @@ class Trainer:
         
         batch_time = AverageMeter()
         losses = AverageMeter()
-        acc_meter = AccuracyMeter()
+        metrics_meter = ComprehensiveMetrics(num_classes=1000)
         
         with torch.no_grad():
             end = time.time()
@@ -141,20 +141,20 @@ class Trainer:
                     loss = self.criterion(outputs, targets)
                 
                 losses.update(loss.item(), images.size(0))
-                acc_meter.update(outputs, targets, images.size(0))
+                metrics_meter.update(outputs, targets, images.size(0))
                 
                 batch_time.update(time.time() - end)
                 end = time.time()
                 
                 pbar.set_postfix({
                     'Loss': f'{losses.avg:.4f}',
-                    'Top1': f'{acc_meter.get_avg()["top1"]:.2f}%',
-                    'Top5': f'{acc_meter.get_avg()["top5"]:.2f}%'
+                    'Top1': f'{metrics_meter.accuracy_meter.get_avg()["top1"]:.2f}%',
+                    'Top5': f'{metrics_meter.accuracy_meter.get_avg()["top5"]:.2f}%'
                 })
         
         metrics = {
             'loss': losses.avg,
-            **acc_meter.get_avg()
+            **metrics_meter.get_metrics()
         }
         
         return metrics

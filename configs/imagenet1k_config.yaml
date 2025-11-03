@@ -1,0 +1,46 @@
+model:
+  name: "resnet50"
+  num_classes: 1000  # ImageNet-1K has 1000 classes
+  pretrained: false
+  
+data:
+  dataset: "imagenet1k"
+  data_path: "/home/ubuntu/datasets/imagenet"  # Path where organized data will be
+  batch_size: 128  # Reduced batch size for EC2 instance
+  num_workers: 4   # Reduced for EC2
+  pin_memory: true
+  
+training:
+  epochs: 90
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 1e-4
+  label_smoothing: 0.1
+  mixup_alpha: 0.2
+  cutmix_alpha: 1.0
+  
+optimizer:
+  name: "sgd"
+  momentum: 0.9
+  weight_decay: 1e-4
+  nesterov: true
+  
+scheduler:
+  name: "cosine"
+  warmup_epochs: 5
+  warmup_lr: 1e-6
+  min_lr: 1e-5
+  
+logging:
+  project_name: "imagenet1k-resnet50"
+  log_interval: 100
+  save_interval: 10
+  use_wandb: true  # Disabled for now
+  log_dir: "/home/ubuntu/imagenet-1k/logs"
+  checkpoint_dir: "/home/ubuntu/imagenet-1k/checkpoints"
+  
+misc:
+  seed: 42
+  device: "cuda"  # Use CUDA if available on EC2
+  amp: true        # Enable automatic mixed precision for faster training
+  compile: false   # Disable torch.compile for compatibility

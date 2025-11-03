@@ -1,0 +1,40 @@
+data:
+  batch_size: 128
+  data_path: /home/ubuntu/datasets/imagenet
+  dataset: imagenet1k
+  num_workers: 4
+  pin_memory: true
+logging:
+  checkpoint_dir: /home/ubuntu/imagenet-1k/checkpoints
+  log_dir: /home/ubuntu/imagenet-1k/logs
+  log_interval: 100
+  project_name: imagenet1k-resnet50
+  save_interval: 10
+  use_wandb: true
+misc:
+  amp: true
+  compile: false
+  device: cuda
+  seed: 42
+model:
+  name: resnet50
+  num_classes: 1000
+  pretrained: false
+optimizer:
+  momentum: 0.9
+  name: sgd
+  nesterov: true
+  weight_decay: 1e-4
+scheduler:
+  min_lr: 1e-5
+  name: cosine
+  warmup_epochs: 5
+  warmup_lr: 1e-6
+training:
+  cutmix_alpha: 1.0
+  epochs: 90
+  label_smoothing: 0.1
+  lr: 0.1
+  mixup_alpha: 0.2
+  momentum: 0.9
+  weight_decay: 1e-4
