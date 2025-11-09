@@ -153,12 +153,15 @@ scheduler:
   min_lr: 1e-5
 ```
 
-// ...existing code...
 ## Training screenshots
 
 ![EC2 training dashboard](ec2_screenshot.png)
 
 ![Weights & Biases run](wandb.png)
+
+## Hugging Face inference
+
+Live demo: https://huggingface.co/spaces/rraghu214/imagenet1k-resnet
 
 ## Final accuracy
 
