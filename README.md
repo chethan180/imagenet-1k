@@ -4,8 +4,8 @@ A comprehensive PyTorch implementation for training ResNet models on ImageNet-1K
 
 ## Features
 
-- **Multiple ResNet Architectures**: ResNet-18, 34, 50, 101, 152
-- **Dataset Support**: ImageNet-1K (full) and ImageNet-100K (subset)
+- **ResNet Architecture**: ResNet- 50
+- **Dataset Support**: ImageNet-1K (full)
 - **Advanced Training Techniques**:
   - Label Smoothing
   - Mixup and CutMix augmentations
@@ -57,8 +57,8 @@ imagenet/
 
 1. **Create and activate virtual environment**:
 ```bash
-python -m venv /Users/chethan/Documents/era/mnist-model/.venv
-source /Users/chethan/Documents/era/mnist-model/.venv/bin/activate
+python3 -m venv .venv
+source venv/bin/activate
 ```
 
 2. **Install dependencies**:
@@ -153,14 +153,19 @@ scheduler:
   min_lr: 1e-5
 ```
 
-## Expected Results
+// ...existing code...
+## Training screenshots
 
-With the default configuration and best practices:
+![EC2 training dashboard](ec2_screenshot.png)
 
-| Model | Dataset | Top-1 Acc | Top-5 Acc | Epochs |
-|-------|---------|-----------|-----------|---------|
-| ResNet-50 | ImageNet-1K | ~76.1% | ~92.9% | 90 |
-| ResNet-50 | ImageNet-100K | ~75.0% | ~92.0% | 90 |
+![Weights & Biases run](wandb.png)
+
+## Final accuracy
+
+| Epoch | Train Loss | Val Loss | Train Top1 | Val Top1 | Train Top5 | Val Top5 |
+|------:|-----------:|---------:|-----------:|---------:|-----------:|---------:|
+| 89 | 2.6608563757342973 | 1.8724307618713378 | 75.33681057321773 | 76.65400001464843 | 91.08035284200385 | 93.37999998046875 |
+// ...existing code...
 
 ## Key Features for High Accuracy
 

@@ -1,2 +1,0 @@
-2025-10-30 22:35:27,959 - INFO - Model info: {'total_parameters': 25557032, 'trainable_parameters': 25557032, 'model_size_mb': 97.49234008789062}
-2025-10-30 22:36:36,437 - INFO - Step 0: {'train_loss_batch': 7.089047431945801, 'train_lr': 0.1, 'batch_time': 68.4724509716034, 'data_time': 2.450559139251709}
