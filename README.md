@@ -2,6 +2,17 @@
 
 A comprehensive PyTorch implementation for training ResNet models on ImageNet-1K and ImageNet-100K datasets with modern training techniques and best practices.
 
+## Training & Validation Accuracy
+
+| Metric        | Accuracy (%) |
+|---------------|--------------|
+| **Training**   | 75.33        |
+| **Validation** | 76.77        |
+
+
+> Source: `c:\Users\cheth\Documents\imagenet-1k\metrics.md`
+
+
 ## Features
 
 - **ResNet Architecture**: ResNet- 50
@@ -155,6 +166,8 @@ scheduler:
 
 ## Training screenshots
 
+![Training statistics](train_stats.png)
+
 ![EC2 training dashboard](ec2_screenshot.png)
 
 ![Weights & Biases run](wandb.png)
@@ -163,11 +176,6 @@ scheduler:
 
 Live demo: https://huggingface.co/spaces/rraghu214/imagenet1k-resnet
 
-## Final accuracy
-
-| Epoch | Train Loss | Val Loss | Train Top1 | Val Top1 | Train Top5 | Val Top5 |
-|------:|-----------:|---------:|-----------:|---------:|-----------:|---------:|
-| 89 | 2.6608563757342973 | 1.8724307618713378 | 75.33681057321773 | 76.65400001464843 | 91.08035284200385 | 93.37999998046875 |
 
 ## Key Features for High Accuracy
 
