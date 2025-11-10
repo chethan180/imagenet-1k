@@ -10,8 +10,7 @@ A comprehensive PyTorch implementation for training ResNet models on ImageNet-1K
 | **Validation** | 76.77        |
 
 
-> Source: `c:\Users\cheth\Documents\imagenet-1k\metrics.md`
-
+📄 **Source:** [`metrics.md`](./metrics.md)
 
 ## Features
 
